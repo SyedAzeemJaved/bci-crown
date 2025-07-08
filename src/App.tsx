@@ -1,7 +1,11 @@
+import { useState } from 'react';
+
 import { motion } from 'framer-motion';
 import { Activity, Brain, Waves, Zap } from 'lucide-react';
-import { useState } from 'react';
+
 import BrainWavesAnimation from './components/BrainWavesAnimation';
+
+const API_URL = 'http://localhost:8000/api/detect';
 
 const Dashboard = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -16,32 +20,20 @@ const Dashboard = () => {
     setResult(null);
 
     try {
-      // Simulate API call - replace with your actual API endpoint
-      await new Promise(resolve => setTimeout(resolve, 3000));
-
-      // Simulate API response - replace with actual API call
-      const mockResponse = await fetch('/api/brain-waves', {
-        method: 'POST',
+      const res = await fetch(API_URL, {
+        method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
+          Accept: 'application/json',
         },
-        body: JSON.stringify({ action: 'analyze' }),
-      }).catch(() => ({ ok: false }));
+      });
 
-      if (mockResponse.ok) {
-        const data = await mockResponse.json();
-        setResult(data.word || 'CONSCIOUSNESS');
-      } else {
-        // Fallback for demo
-        const words = [
-          'CONSCIOUSNESS',
-          'AWARENESS',
-          'THOUGHT',
-          'MIND',
-          'INTELLIGENCE',
-        ];
-        setResult(words[Math.floor(Math.random() * words.length)]);
+      if (!res.ok) {
+        throw new Error('Failed to analyze brain waves');
       }
+
+      const resp = await res.json();
+
+      setResult(resp?.word?.toUpperCase() || 'Error');
     } catch (error) {
       console.error('Error analyzing brain waves:', error);
       setResult('ERROR');
@@ -70,7 +62,7 @@ const Dashboard = () => {
           className='mb-12 text-center'
         >
           <h1 className='mb-4 bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-6xl font-bold text-transparent'>
-            AI Assisted Brain-Computer Interface For EEG to Text Communication
+            AI-Assisted Brain-Computer Interface for EEG to Text
           </h1>
           <p className='mx-auto max-w-2xl text-xl text-gray-300'>
             Advanced Brain-Computer Interface for Real-Time Thought to Text
@@ -166,7 +158,7 @@ const Dashboard = () => {
                 <div className='text-center'>
                   <Zap className='mx-auto mb-4 h-16 w-16 text-gray-500' />
                   <p className='text-xl text-gray-400'>
-                    Click "Analyze Brain Waves" to begin
+                    Click &ldquo;Analyze Brain Waves&rdquo; to begin
                   </p>
                 </div>
               )}
